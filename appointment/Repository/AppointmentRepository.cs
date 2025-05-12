@@ -14,7 +14,7 @@ public class AppointmentRepository : IAppointmentRepository
 
     public async Task<Appointment> GetAppointmentByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var con = new SqlConnection();
+        var con = new SqlConnection(_connectionString);
         var com = new SqlCommand();
 
         com.Connection = con;
@@ -54,5 +54,22 @@ public class AppointmentRepository : IAppointmentRepository
 
         await con.DisposeAsync();
         return result > 0;
+    }
+
+
+    private async Task<int> GetMaxAppointmentIdAsync(CancellationToken cancellationToken)
+    {
+        var con = new SqlConnection();
+        var com = new SqlCommand();
+
+        com.Connection = con;
+        com.CommandText = "select max(appointment_id) from Appointment)";
+
+        await con.OpenAsync(cancellationToken);
+
+        var result = (int)await com.ExecuteScalarAsync(cancellationToken);
+
+        await con.DisposeAsync();
+        return result;
     }
 }
